@@ -1,5 +1,5 @@
 /**
- * RTnoTemplate.ino
+ * LEDTest.ino
  * RTno is RT-middleware and arduino.
  *
  * Using RTno, arduino device can communicate any RT-components 
@@ -88,8 +88,8 @@ void rtcconf(config_str& conf, exec_cxt_str& exec_cxt) {
  * Please refer following comments. If you need to use some ports,
  * uncomment the line you want to declare.
  **/
-//TimedLong in0;
-//InPort<TimedLong> in0In("in0", in0);
+TimedLong in0;
+InPort<TimedLong> in0In("in0", in0);
 //TimedLongSeq in1;
 //InPort<TimedLongSeq> in1In("in1", in1);
 
@@ -114,10 +114,11 @@ int RTno::onInitialize() {
   addOutPort(out0Out);
   addOutPort(out1Out);
   */
+  addInPort(in0In);
   
   // Some initialization (like port direction setting)
-  // int LED = 13;
-  // pinMode(LED, OUTPUT);
+  int LED = 13;
+  pinMode(LED, OUTPUT);
   return RTC_OK; 
 }
 
@@ -131,7 +132,7 @@ int RTno::onInitialize() {
 ////////////////////////////////////////////
 int RTno::onActivated() {
   // Write here initialization code.
-  
+  digitalWrite(13, LOW);
   return RTC_OK; 
 }
 
@@ -143,7 +144,7 @@ int RTno::onActivated() {
 int RTno::onDeactivated()
 {
   // Write here finalization code.
-
+  digitalWrite(13, LOW);
   return RTC_OK;
 }
 
@@ -163,7 +164,11 @@ int RTno::onExecute() {
     long data = in0.data;
   } 
   */
-  
+  if(in0In.isNew()) {
+    in0In.read();
+    long data = in0.data;
+    digitalWrite(13, data > 0 ? HIGH : LOW);
+  } 
   /**
    * Usage of InPort with sequence type
   if(in1In.isNew(&in1In)) {
